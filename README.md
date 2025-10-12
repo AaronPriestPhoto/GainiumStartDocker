@@ -21,7 +21,7 @@ This repository provides a convenient Windows batch script (`Gainium.bat`) that:
 
 ### 1. Clone This Repository
 ```bash
-git clone https://github.com/yourusername/GainiumStartDocker.git
+git clone https://github.com/AaronPriestPhoto/GainiumStartDocker.git
 cd GainiumStartDocker
 ```
 
