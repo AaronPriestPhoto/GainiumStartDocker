@@ -4,12 +4,14 @@ A simple Windows batch script wrapper for the official [Gainium Docker setup](ht
 
 ## 🚀 What This Does
 
-This repository provides a convenient Windows batch script (`Gainium.bat`) that:
+This repository provides convenient Windows batch scripts that:
 
 1. **Checks if Docker Desktop is running** - If not, it starts Docker Desktop automatically
 2. **Downloads the latest configuration** - Pulls the most recent `docker-compose.yml` from the official Gainium repository
 3. **Manages containers** - Starts or stops the Gainium trading platform containers
-4. **Opens the dashboard** - Automatically opens your browser to the Gainium web interface
+4. **Automatic backups** - Creates timestamped backups of all data volumes before updates
+5. **Data restoration** - Restore from previous backups if needed
+6. **Opens the dashboard** - Automatically opens your browser to the Gainium web interface
 
 ## 📋 Prerequisites
 
@@ -42,9 +44,15 @@ Gainium.bat
 
 ### 4. Choose Your Action
 The script will present you with options:
-- **[U] Update/Start** - Downloads latest config and starts containers
-- **[D] Shut Down** - Stops all containers
+- **[U] Backup + Update/Start** - Creates backups, downloads latest config, and starts containers
+- **[D] Shut Down** - Gracefully stops all containers
 - **[Q] Quit** - Exits the script
+
+### 5. Restore from Backup (if needed)
+```bash
+# If you need to restore from a backup
+restore_Gainium.bat
+```
 
 ## 🏗️ What Gets Started
 
@@ -76,18 +84,19 @@ PRICE_CONNECTOR_EXCHANGES=binance,kucoin,bybit
 
 ## 🛠️ Usage
 
-### Starting Gainium
+### Starting Gainium with Backup
 ```bash
 Gainium.bat
-# Choose [U] for Update/Start
+# Choose [U] for Backup + Update/Start
 ```
 
 The script will:
 1. Start Docker Desktop if needed
-2. Download the latest `docker-compose.yml` from the official repository
-3. Pull the latest Docker images
-4. Start all services
-5. Open http://localhost:7500 in your browser
+2. **Create timestamped backups** of all data volumes (mongo, redis, rabbitmq, backtest data)
+3. Download the latest `docker-compose.yml` from the official repository
+4. Pull the latest Docker images
+5. Start all services
+6. Open http://localhost:7500 in your browser
 
 ### Stopping Gainium
 ```bash
@@ -95,7 +104,29 @@ Gainium.bat
 # Choose [D] for Shut Down
 ```
 
-This stops all containers but keeps your data intact.
+This gracefully stops all containers but keeps your data intact.
+
+### Restoring from Backup
+```bash
+restore_Gainium.bat
+```
+
+This script allows you to:
+- View available backups
+- Select which volumes to restore
+- Restore from the most recent backup
+- Automatically restart services after restoration
+
+### Backup Features
+
+The enhanced scripts include robust backup capabilities:
+
+- **Automatic backups** before every update
+- **Timestamped archives** (format: `volume_backup_YYYYMMDD_HHMM.tar.gz`)
+- **Integrity verification** of backup files
+- **Automatic cleanup** (keeps 7 most recent backups per volume)
+- **Selective restoration** of individual volumes
+- **Lock file protection** prevents multiple simultaneous operations
 
 ### Manual Docker Commands
 
@@ -141,6 +172,18 @@ docker compose logs
 
 # Reset everything (WARNING: deletes data)
 docker compose down -v
+```
+
+### Data Recovery
+```bash
+# If you need to restore from backup
+restore_Gainium.bat
+
+# List available backups
+dir *_backup_*.tar.gz
+
+# Manual backup verification
+tar -tzf volume_backup_YYYYMMDD_HHMM.tar.gz
 ```
 
 ## 📊 Monitoring
